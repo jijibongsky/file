@@ -1,0 +1,13 @@
+﻿cd C:\\Users\\15810\\Desktop\\file
+
+git add -A          全部文件
+git status -s         查看
+
+git init                         初始化
+git add README.md                加文件
+git commit -m "first commit"     初始化项目版本
+
+git clone git://github.com/jijibongsky/file        （可以没有）
+
+git remote add origin https://github.com/jijibongsky/ceshi.git    提交远程
+git push -u origin master        推送
