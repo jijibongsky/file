@@ -1,0 +1,63 @@
+https://blog.csdn.net/tonydz0523/article/details/83109343
+
+第一：安装显卡驱动：
+
+nvidia-smi
+
+第二步 GCC 降级
+sudo apt-get update
+下载安装 gcc4.8
+sudo apt-get install gcc-4.8
+sudo apt-get install g++-4.8
+配置：
+cd /usr/bin
+sudo mv gcc gcc.bak #备份
+sudo ln -s gcc-4.8 gcc #重新链接
+sudo mv g++ g++.bak
+sudo ln -s g++-4.8 g++
+查看版本号：
+gcc -v && g++ -v 
+
+第三步 安装 CUDA
+https://developer.nvidia.com/cuda-90-download-archive?target_os=Linux&target_arch=x86_64&target_distro=Ubuntu&target_version=1604&target_type=runfilelocal
+sudo sh cuda_9.0.176_384.81_linux.run
+sudo sh cuda_9.0.176.1_linux.run
+sudo sh cuda_9.0.176.2_linux.run
+sudo sh cuda_9.0.176.3_linux.run
+sudo sh cuda_9.0.176.4_linux.run
+
+配置环境变量
+sudo vim ~/.bashrc
+export PATH=/usr/local/cuda-9.0/bin:$PATH
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda-9.0/lib64
+export CUDA_HOME=/usr/local/cuda-9.0
+重新加载一下：
+source ~/.bashrc
+nvcc -V
+
+第四步 安装cudnn  cuDNN v7.0.5 Library for Linux
+https://developer.nvidia.com/rdp/cudnn-archive
+解压文件
+tar -zxvf cudnn-9.0-linux-x64-v7.solitairetheme8
+# 复制相应文件
+sudo cp -P cuda/lib64/libcudnn* /usr/local/cuda-9.0/lib64/
+sudo cp  cuda/include/cudnn.h /usr/local/cuda-9.0/include/
+# 所有用户可读
+sudo chmod a+r /usr/local/cuda-9.0/include/cudnn.h /usr/local/cuda/lib64/libcudnn*
+
+
+第五步 创建沙箱
+sudo apt-get update
+sudo apt-get install python-virtualenv
+virtualenv --system-site-package --python=python3 tensorflow1.12
+
+
+第六步 安装tensorflow
+更换 python 源
+pip install --upgrade tensorflow-gpu==1.12
+
+第七步 配置 pycharm
+LD_LIBRARY_PATH:/usr/local/lib64:/usr/local/cuda-9.0/lib64
+1. File | Settings | Build, Execution, Deployment | Console | Python Console
+2. run | edit config          python
+
