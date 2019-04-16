@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 import json
 
-def load_data(file_read, file_write):
+def load_data(file_read):
     rf = open(file_read, 'r', encoding='utf8')
-    wf = open(file_write, 'w', encoding='utf8')
     k = 0
     kk = []
     for line in rf:
@@ -12,15 +11,6 @@ def load_data(file_read, file_write):
         data_dict = json.loads(line)
 
         kk.append(len(data_dict["conversation"]))
-        # if len(data_dict["conversation"]) % 2 != 0:
-        #     print(line)
-        #     print("data_dict====", len(data_dict["conversation"]))
-
-        # for key in data_dict:
-            # print(key, data_dict[key])
-            # print(key, len(data_dict[key]))
-            # print()
-    a = set(kk)
     b = {}
     for i in kk:
         if i in b:
@@ -28,15 +18,40 @@ def load_data(file_read, file_write):
         else:
             b[i] = 1
     print(b)
-
     rf.close()
-    wf.close()
+
+
+def load_data1(file_read):
+    rf = open(file_read, 'r', encoding='utf8')
+    k = 0
+    for line in rf:
+        k += 1
+        line = line.strip()
+        data_dict = json.loads(line)
+        for sen in data_dict["goal"]:
+            print(sen)
+        print()
+        for sen in data_dict["conversation"]:
+            print(sen)
+        input("--")
+    rf.close()
+
+
+def load_data2(file_read):
+    rf = open(file_read, 'r', encoding='utf8')
+    k = 0
+    for line in rf:
+        k += 1
+        line = line.strip()
+        data_dict = json.loads(line)
+        if len(data_dict["goal"][0]) != 3:
+            print(len(data_dict["goal"][0]))
+    rf.close()
 
 
 root_dir = "C:/Users/25363/Downloads/新建文件夹/Compressed/Dialogue-Retrieval/知识驱动对话数据/data/"
-file_read = root_dir + "train.txt"
-file_write = root_dir + 'ceshi.txt'
-load_data(file_read, file_write)
+file_read = root_dir + "dev.txt"
+load_data2(file_read)
 
 # train 19858  goal(2,3)  knowledge（平均 14.1584）    conversation(两个15，其余全是偶数，平均 9.0542)
 # goal  {2: 11720, 3: 8138}
