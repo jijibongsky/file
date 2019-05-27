@@ -1,0 +1,78 @@
+跟换国内源
+/etc/docker/daemon.json
+{
+"registry-mirrors": ["http://4e70ba5d.m.daocloud.io"]
+}
+
+systemctl restart docker
+
+
+列出容器，删除容器，镜像
+docker ps -a
+docker rm 
+docker rmi 
+
+如果想要删除所有container的话再加一个指令：
+docker rm $(docker ps -a -q)
+
+
+
+docker images
+
+docker pull tensorflow/tensorflow:1.5.0-py3
+docker run -it -v /home/ceshi:/home tensorflow/tensorflow:1.5.0-py3 /bin/bash
+
+
+将镜像 tensorflow/tensorflow:1.5.0-py3 生成tensorflow:1.5.0-py3.tar
+docker save -o tensorflow:1.5.0-py3.tar tensorflow/tensorflow:1.5.0-py3
+
+
+传到一个新的地方启动
+scp -r 192.168.2.100：/home/skk/tensorflow:1.5.0-py3.tar /home/data/
+docker load -i tensorflow:1.5.0-py3.tar
+docker run -it tensorflow/tensorflow:1.5.0-py3 /bin/bash
+
+
+启动镜像之后另外启动一个页面
+docker ps -a
+
+
+保存改进过的容器，之前在容器中安装过得软件会被一起保存
+docker commit de609d967e24 new_ceshi:v1.0
+docker run -it new_ceshi:v1.0 /bin/bash
+
+
+通过 Dockerfile 文件创建一个镜像，叫 ceshi_dockerfile:v1.0，最后又个点
+docker build -f Dockerfile -t ceshi_dockerfile:v1.0 .
+docker run -it ceshi_dockerfile:v1.0 /bin/bash
+
+
+其中 Dockerfile
+FROM tensorflow/tensorflow:1.5.0-py3
+WORKDIR /home
+
+
+
+GPU版本的tensorflow 要设置字符集为 utf-8
+docker pull tensorflow/tensorflow:1.5.0-gpu-py3
+nvidia-docker run -it tensorflow/tensorflow:1.5.0-gpu-py3 /bin/bash
+nvidia-docker run -e PYTHONIOENCODING=utf-8 -it -v /home/sun/deep_learning/text_matching:/home/skk tensorflow/tensorflow:1.5.0-gpu-py3 /bin/bash
+
+
+docker build -f Dockerfile1 -t ceshi_dockerfile:v1.0 .
+
+
+其中 Dockerfile1 
+FROM tensorflow/tensorflow:1.5.0-gpu-py3
+
+# 代码添加到 /home/skk
+ADD ceshi/ /home/skk/
+
+# 设置 /home/skk 文件夹是工作目录
+WORKDIR /home/skk
+CMD ["python", "ceshi.py"]
+
+
+nvidia-docker run -it ceshi_dockerfile:v1.0 /bin/bash
+nvidia-docker logs 516177d4c1dd
+
