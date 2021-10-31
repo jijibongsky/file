@@ -1,0 +1,68 @@
+import websocket  # websocket-client        1.2.1
+import time
+import json
+import numpy as np
+import struct
+from pydub import AudioSegment
+
+
+def get_data():
+    data_file = "BAC009S0764W0121.wav"
+    sound = AudioSegment.from_file(data_file, format="wav")
+    wavform = np.frombuffer(sound.get_array_of_samples(), dtype=np.int16)
+    wavform1 = [int(i) for i in wavform]
+    interval = 0.5
+    for i in range(0, len(wavform1), int(interval * 16000)):
+        start_id = i
+        end_id = min(len(wavform1), int(i + interval * 16000))
+        T_wavform = wavform1[start_id:end_id]
+        yield T_wavform
+        time.sleep(interval)
+
+
+def on_message(ws, message):
+    print(111111, message)
+    data_list = get_data()
+    for i, data in enumerate(data_list):
+        print(2222222222, len(data))
+        dataStr = b''
+        for uint_16t in data:
+            dataStr += struct.pack('h', uint_16t)
+        ws.send(dataStr, opcode=websocket.ABNF.OPCODE_BINARY)
+
+
+def on_error(ws, error):
+    print(33333333, error)
+
+
+def on_close(ws, close_status_code, close_msg):
+    stop_tag = {"signal": "end"}
+    stop_tag = json.dumps(stop_tag)
+    ws.send(stop_tag)
+
+
+def on_open(ws):
+    start_tag = {"signal": "start", "nbest": 1, "continuous_decoding": False}
+    start_tag = json.dumps(start_tag)
+    ws.send(start_tag)
+
+
+if __name__ == "__main__":
+    websocket.enableTrace(True)
+    # ws://localhost:10086  ws://192.168.2.100:10086
+    ws = websocket.WebSocketApp("ws://192.168.2.100:10086",
+                                on_open=on_open,
+                                on_message=on_message,
+                                on_error=on_error,
+                                on_close=on_close)
+    ws.run_forever()
+
+"""
+docker run --rm -it -p 10086:10086 \
+-v /Users/sunkangkang/Downloads/20210602_unified_transformer_server:/home/wenet/model \
+mobvoiwenet/wenet:mini bash /home/run.sh
+
+docker run --rm -it -p 10086:10086 \
+-v /home/data/deep_learning/torch/wenet/model/20210602_unified_transformer_server:/home/wenet/model \
+mobvoiwenet/wenet:mini bash /home/run.sh
+"""
